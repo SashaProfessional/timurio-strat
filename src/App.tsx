@@ -16,7 +16,34 @@ function App() {
 
   const [kneeInfos, setKneeInfos] = useState<KneeInfo[]>([])
 
-  useEffect(() => updateCalculationData(), [balance, percent, kneeQuantity, multiplier])
+  useEffect(() => {
+    if (!balance || !percent || !kneeQuantity || !multiplier) {
+      setTarget(null)
+      setRoe(null)
+      setKneeInfos([])
+
+      return;
+    }
+
+    const newTarget = new Decimal(balance).mul(percent).dividedBy(100).toDP(2)
+
+    const newKneeInfos: KneeInfo[] = []
+    const b1 = balance.mul(new Decimal(1).sub(multiplier)).dividedBy(new Decimal(1).sub(multiplier.toPower(kneeQuantity)))
+
+    for (let i = 0; i < kneeQuantity.toNumber(); i++) {
+      const index = new Decimal(i + 1)
+      newKneeInfos.push({
+        index: index.toNumber(),
+        margin: b1.mul(multiplier.toPower(index.minus(1))).toDP(2).toNumber(),
+        sum: b1.mul(new Decimal(1).minus(multiplier.toPower(index))).dividedBy(new Decimal(1).minus(multiplier)).toDP(2).toNumber()
+      })
+
+    }
+
+    setTarget(newTarget.toNumber())
+    setRoe(newTarget.dividedBy(b1).mul(100).toNumber())
+    setKneeInfos(newKneeInfos)
+  }, [balance, percent, kneeQuantity, multiplier])
 
   const onBalanceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setBalance(getValidatedNumberInput(e.target.value))
@@ -50,36 +77,6 @@ function App() {
     }
 
     return parcedValue
-  }
-
-  const updateCalculationData = () => {
-    if (!balance || !percent || !kneeQuantity || !multiplier) {
-      setTarget(null)
-      setRoe(null)
-      setKneeInfos([])
-
-      return;
-    }
-
-    const newTarget = new Decimal(balance).mul(percent).dividedBy(100).toDP(2)
-
-    const newKneeInfos: KneeInfo[] = []
-    const b1 = balance.mul(new Decimal(1).sub(multiplier)).dividedBy(new Decimal(1).sub(multiplier.toPower(kneeQuantity)))
-
-    setTarget(newTarget.toNumber())
-    setRoe(newTarget.dividedBy(b1).mul(100).toNumber())
-
-    for (let i = 0; i < kneeQuantity.toNumber(); i++) {
-      const index = new Decimal(i + 1)
-      newKneeInfos.push({
-        index: index.toNumber(),
-        margin: b1.mul(multiplier.toPower(index.minus(1))).toDP(2).toNumber(),
-        sum: b1.mul(new Decimal(1).minus(multiplier.toPower(index))).dividedBy(new Decimal(1).minus(multiplier)).toDP(2).toNumber()
-      })
-
-    }
-
-    setKneeInfos(newKneeInfos)
   }
 
   return (
