@@ -4,15 +4,17 @@
 }
 
 .inputs-wrapper {
-  justify-content: center;
   display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
   gap: 30px;
 }
 
 .input-wrapper {
   display: flex;
   flex-direction: column;
-  flex-grow: 1;
+  flex: 1;
+  min-width: 100px;
 }
 
 .summary-wrapper {
@@ -27,6 +29,11 @@
 .table-wrapper table {
   width: 100%;
   text-align: center;
+}
+
+.error-wrapper{
+  text-align: center;
+  margin: 20px 0;
 }
 
 input::-webkit-outer-spin-button,

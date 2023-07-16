@@ -16,7 +16,11 @@ function App() {
 
   const [kneeInfos, setKneeInfos] = useState<KneeInfo[]>([])
 
+  const [isError, setIsError] = useState(false)
+
   useEffect(() => {
+    setIsError(false)
+
     if (!balance || !percent || !kneeQuantity || !multiplier) {
       setTarget(null)
       setRoe(null)
@@ -30,8 +34,16 @@ function App() {
     const newKneeInfos: KneeInfo[] = []
     const b1 = balance.mul(new Decimal(1).sub(multiplier)).dividedBy(new Decimal(1).sub(multiplier.toPower(kneeQuantity)))
 
+    if (b1.isNaN()) {
+      setTarget(null)
+      setRoe(null)
+      setKneeInfos([])
+      setIsError(true)
+    }
+
     for (let i = 0; i < kneeQuantity.toNumber(); i++) {
       const index = new Decimal(i + 1)
+
       newKneeInfos.push({
         index: index.toNumber(),
         margin: b1.mul(multiplier.toPower(index.minus(1))).toDP(2).toNumber(),
@@ -100,7 +112,7 @@ function App() {
         </div>
       </div>
 
-      {kneeInfos.length ?
+      {kneeInfos.length && !isError ?
         <>
           <div className='summary-wrapper'>
             <div>Цель: ${target}</div>
@@ -129,6 +141,8 @@ function App() {
           </div>
         </>
         : null}
+
+      {isError ? <div className='error-wrapper'>Невозможно вычислить</div> : null}
     </div>
   );
 }
