@@ -10,6 +10,7 @@ function App() {
   const [percent, setPercent] = useState("")
   const [kneeQuantity, setKneeQuantity] = useState("")
   const [multiplier, setMultiplier] = useState("")
+  const [leverage, setLeverage] = useState("")
 
   const [target, setTarget] = useState<number | null>(null)
   const [roe, setRoe] = useState<number | null>(null)
@@ -46,11 +47,13 @@ function App() {
 
     for (let i = 0; i < +kneeQuantity; i++) {
       const index = new Decimal(i + 1)
+      const margin = b1.mul(multiplierDecimal.toPower(index.minus(1))).toDP(2)
 
       newKneeInfos.push({
         index: index.toNumber(),
-        margin: b1.mul(multiplierDecimal.toPower(index.minus(1))).toDP(2).toNumber(),
-        sum: b1.mul(new Decimal(1).minus(multiplierDecimal.toPower(index))).dividedBy(new Decimal(1).minus(multiplier)).toDP(2).toNumber()
+        margin: margin.toNumber(),
+        sum: b1.mul(new Decimal(1).minus(multiplierDecimal.toPower(index))).dividedBy(new Decimal(1).minus(multiplier)).toDP(2).toNumber(),
+        quantity: margin.mul(leverage).toDP(2).toNumber()
       })
 
     }
@@ -58,7 +61,7 @@ function App() {
     setTarget(newTarget.toNumber())
     setRoe(newTarget.dividedBy(b1).mul(100).toNumber())
     setKneeInfos(newKneeInfos)
-  }, [balance, percent, kneeQuantity, multiplier])
+  }, [balance, percent, kneeQuantity, multiplier, leverage])
 
   const onBalanceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setBalance(getValidatedNumberInput(e))
@@ -74,6 +77,10 @@ function App() {
 
   const onMultiplierChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMultiplier(getValidatedNumberInput(e))
+  }
+
+  const onLeverageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLeverage(getValidatedNumberInput(e))
   }
 
   const getValidatedNumberInput = (e: React.ChangeEvent<HTMLInputElement>, decimalPoints = 2, max = Number.MAX_SAFE_INTEGER) => {
@@ -126,6 +133,10 @@ function App() {
           <span>Мн. колен</span>
           <input type="number" inputMode="numeric" value={multiplier} onChange={onMultiplierChange} />
         </div>
+        <div className='input-wrapper'>
+          <span>Плечо</span>
+          <input type="number" inputMode="numeric" value={leverage} onChange={onLeverageChange} />
+        </div>
       </div>
 
       {kneeInfos.length && !isError ?
@@ -142,6 +153,7 @@ function App() {
                   <th>Колено</th>
                   <th>Маржа</th>
                   <th>Сумма</th>
+                  <th>Кол-во (USDT)</th>
                 </tr>
               </thead>
               <tbody>
@@ -149,6 +161,7 @@ function App() {
                   <tr key={kneeInfo.index}>
                     <td>{kneeInfo.index}</td>
                     <td>{kneeInfo.margin}</td>
+                    <td>{kneeInfo.sum}</td>
                     <td>{kneeInfo.sum}</td>
                   </tr>
                 )}
