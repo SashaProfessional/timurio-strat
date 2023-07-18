@@ -162,7 +162,7 @@ function App() {
                     <td>{kneeInfo.index}</td>
                     <td>{kneeInfo.margin}</td>
                     <td>{kneeInfo.sum}</td>
-                    <td>{kneeInfo.sum}</td>
+                    <td>{kneeInfo.quantity}</td>
                   </tr>
                 )}
               </tbody>
