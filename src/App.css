@@ -27,12 +27,19 @@
   justify-content: center;
 }
 
+.table-wrapper th:nth-child(1),
+.table-wrapper th:nth-child(2),
+.table-wrapper th:nth-child(3),
+.table-wrapper th:nth-child(4) {
+  width: 25%;
+}
+
 .table-wrapper table {
   width: 100%;
   text-align: center;
 }
 
-.error-wrapper{
+.error-wrapper {
   text-align: center;
   margin: 20px 0;
 }

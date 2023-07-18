@@ -22,7 +22,7 @@ function App() {
   useEffect(() => {
     setIsError(false)
 
-    if (!balance || !percent || !kneeQuantity || !multiplier) {
+    if (!balance || !percent || !kneeQuantity || !multiplier || !leverage) {
       setTarget(null)
       setRoe(null)
       setKneeInfos([])
